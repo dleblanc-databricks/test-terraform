@@ -1,4 +1,5 @@
 provider "databricks" {
+  source = "databrickslabs/databricks"
 }
 
 data "databricks_current_user" "me" {}
