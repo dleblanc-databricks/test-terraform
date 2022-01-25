@@ -1,6 +1,12 @@
-provider "databricks" {
-  source = "databrickslabs/databricks"
+terraform {
+  required_providers {
+    databricks = {
+      source = "databrickslabs/databricks"
+    }
+  }
 }
+
+provider "databricks" {}
 
 data "databricks_current_user" "me" {}
 data "databricks_spark_version" "latest" {}
