@@ -24,7 +24,7 @@ resource "databricks_job" "this" {
   }
 
   notebook_task {
-    notebook_path = "${databricks_repo.dewd.path}/Data-Engineering-With-Databricks/01 - Databricks Lakehouse/DE 1.3.1 - Managing Delta Tables.sql"
+    notebook_path = "${databricks_repo.dewd.path}/Data-Engineering-With-Databricks/01 - Databricks Lakehouse Platform/DE 1.3.1 - Managing Delta Tables"
   }
 }
 
