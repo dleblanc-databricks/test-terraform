@@ -6,7 +6,7 @@ data "databricks_node_type" "smallest" {
   local_disk = true
 }
 
-resource "databricks_job" "this" {
+resource "databricks_job" "job" {
   name = "Terraform Repo Demo (${data.databricks_current_user.me.alphanumeric})"
 
   new_cluster {
