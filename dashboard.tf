@@ -18,12 +18,17 @@ resource "databricks_sql_query" "sales_over_time" {
   run_as_role    = "viewer"
 }
 
+resource "databricks_sql_query" "top_ten_customers" {
+  data_source_id = databricks_sql_endpoint.endpoint.data_source_id
+  name           = "Customer Leaderboard (Terraform)"
+  query          = "SELECT customer_name,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM hive_metastore.dbacademy_david_leblanc_dewd.sales_orders_cleaned) GROUP BY customer_name ORDER BY revenue DESC LIMIT 10"
+  run_as_role    = "viewer"
+}
+
 resource "databricks_sql_visualization" "revenue_by_state" {
   query_id    = databricks_sql_query.revenue_by_state.id
   type        = "choropleth"
   name        = "Revenue by State (Terraform)"
-
-  // The options encoded in this field are passed verbatim to the SQLA API.
   options = jsonencode(
     {
       "mapType": "usa",
@@ -140,6 +145,75 @@ resource "databricks_sql_visualization" "sales_over_time" {
       },
       "showPlotlyControls": true,
       "hideXAxis": false
+    }
+  )
+}
+
+resource "databricks_sql_visualization" "top_ten_customers" {
+  query_id    = databricks_sql_query.top_ten_customers.id
+  type        = "table"
+  name        = "Customer Leaderboard (Terraform)"
+  options = jsonencode(
+    {
+      "itemsPerPage": 10,
+      "condensed": false,
+      "columns": [
+          {
+              "booleanValues": [
+                  "false",
+                  "true"
+              ],
+              "imageUrlTemplate": "{{ @ }}",
+              "imageTitleTemplate": "{{ @ }}",
+              "imageWidth": "",
+              "imageHeight": "",
+              "linkUrlTemplate": "{{ @ }}",
+              "linkTextTemplate": "{{ @ }}",
+              "linkTitleTemplate": "{{ @ }}",
+              "linkOpenInNewTab": true,
+              "name": "customer_name",
+              "type": "string",
+              "displayAs": "string",
+              "visible": true,
+              "order": 100000,
+              "title": "Customer",
+              "allowSearch": false,
+              "alignContent": "left",
+              "allowHTML": false,
+              "highlightLinks": false,
+              "useMonospaceFont": false,
+              "preserveWhitespace": false
+          },
+          {
+              "numberFormat": "‘($ 0.00 a)’",
+              "booleanValues": [
+                  "false",
+                  "true"
+              ],
+              "imageUrlTemplate": "{{ @ }}",
+              "imageTitleTemplate": "{{ @ }}",
+              "imageWidth": "",
+              "imageHeight": "",
+              "linkUrlTemplate": "{{ @ }}",
+              "linkTextTemplate": "{{ @ }}",
+              "linkTitleTemplate": "{{ @ }}",
+              "linkOpenInNewTab": true,
+              "name": "revenue",
+              "type": "integer",
+              "displayAs": "number",
+              "visible": true,
+              "order": 100001,
+              "title": "Purchased",
+              "allowSearch": false,
+              "alignContent": "right",
+              "allowHTML": false,
+              "highlightLinks": false,
+              "useMonospaceFont": false,
+              "preserveWhitespace": false
+          }
+      ],
+      "version": 2,
+      "showPlotlyControls": true
     }
   )
 }
