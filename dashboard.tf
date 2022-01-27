@@ -72,6 +72,7 @@ resource "databricks_sql_visualization" "sales_over_time" {
   name        = "Sales Over Time (Terraform)"
   options = jsonencode(
     {
+      "version": 2,
       "globalSeriesType": "line",
       "xAxis": {
           "type": "-",
@@ -96,6 +97,37 @@ resource "databricks_sql_visualization" "sales_over_time" {
               "opposite": true
           }
       ],
+      "alignYAxesAtZero": false,
+      "error_y": {
+          "type": "data",
+          "visible": true
+      },
+      "series": {
+          "stacking": null,
+          "error_y": {
+              "type": "data",
+              "visible": true
+          }
+      },
+      "seriesOptions": {
+        "revenue": {
+            "yAxis": 0
+        }
+      },
+      "valuesOptions": {},
+      "direction": {
+          "type": "counterclockwise"
+      },
+      "sizemode": "diameter",
+      "coefficient": 1,
+      "numberFormat": "0,0[.]00000",
+      "percentFormat": "0[.]00%",
+      "textFormat": "",
+      "missingValuesAsZero": true,
+      "useAggregationsUi": false,
+      "swappedAxes": false,
+      "dateTimeFormat": "YYYY-MM-DD HH:mm",
+      "showDataLabels": false,
       "columnConfigurationMap": {
           "x": {
               "column": "day"
@@ -105,7 +137,9 @@ resource "databricks_sql_visualization" "sales_over_time" {
                   "column": "revenue"
               }
           ]
-      }
+      },
+      "showPlotlyControls": true,
+      "hideXAxis": false
     }
   )
 }
