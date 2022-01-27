@@ -12,3 +12,8 @@ variable "course_name" {
   description = "DBFS/Database Namespace Separator"
   default     = "dewd"
 }
+
+variable "metastore" {
+  description = "Target metastore"
+  default     = "hive_metastore"
+}
