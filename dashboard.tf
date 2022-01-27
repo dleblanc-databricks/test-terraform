@@ -7,6 +7,6 @@ resource "databricks_sql_endpoint" "endpoint" {
 resource "databricks_sql_query" "revenue_by_state" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
   name           = "Revenue by State (Terraform)"
-  query          = "SELECT state,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline_pipeline.target}.sales_orders_cleaned) GROUP BY state ORDER BY state"
+  query          = "SELECT state,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned) GROUP BY state ORDER BY state"
   run_as_role    = "viewer"
 }
