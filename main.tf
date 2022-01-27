@@ -6,6 +6,10 @@ data "databricks_node_type" "smallest" {
   local_disk = true
 }
 
+resource "databricks_repo" "repo" {
+  url = var.repo_url
+}
+
 resource "databricks_job" "job" {
   name = "Terraform Repo Demo (${data.databricks_current_user.me.alphanumeric})"
 
