@@ -6,16 +6,22 @@ resource "databricks_sql_endpoint" "endpoint" {
 
 resource "databricks_sql_query" "revenue_by_state" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
-  name           = "Revenue by State (Terraform2)"
+  name           = "Revenue by State (Terraform)"
   query          = "SELECT state,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned) GROUP BY state ORDER BY state"
+  run_as_role    = "viewer"
+}
+
+resource "databricks_sql_query" "sales_over_time" {
+  data_source_id = databricks_sql_endpoint.endpoint.data_source_id
+  name           = "Sales Over Time (Terraform)"
+  query          = "SELECT DATE_FORMAT(order_datetime, 'y-MM-dd') AS day, SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM hive_metastore.dbacademy_david_leblanc_dewd.sales_orders_cleaned WHERE order_datetime IS NOT NULL) GROUP BY day ORDER BY day"
   run_as_role    = "viewer"
 }
 
 resource "databricks_sql_visualization" "revenue_by_state" {
   query_id    = databricks_sql_query.revenue_by_state.id
-  type        = "CHOROPLETH"
+  type        = "choropleth"
   name        = "Revenue by State (Terraform)"
-  description = "Some Description"
 
   // The options encoded in this field are passed verbatim to the SQLA API.
   options = jsonencode(
@@ -49,6 +55,50 @@ resource "databricks_sql_visualization" "revenue_by_state" {
       "columnConfigurationMap": {
           "x": {
               "column": "state"
+          },
+          "y": [
+              {
+                  "column": "revenue"
+              }
+          ]
+      }
+    }
+  )
+}
+
+resource "databricks_sql_visualization" "sales_over_time" {
+  query_id    = databricks_sql_query.sales_over_time.id
+  type        = "chart"
+  name        = "Sales Over Time (Terraform)"
+  options = jsonencode(
+    {
+      "globalSeriesType": "line",
+      "xAxis": {
+          "type": "-",
+          "labels": {
+              "enabled": false
+          },
+          "title": {
+              "text": "Time"
+          }
+      },
+      "yAxis": [
+          {
+              "type": "-",
+              "title": {
+                  "text": "Sales"
+              },
+              "rangeMin": 0,
+              "rangeMax": 4000000
+          },
+          {
+              "type": "-",
+              "opposite": true
+          }
+      ],
+      "columnConfigurationMap": {
+          "x": {
+              "column": "day"
           },
           "y": [
               {
