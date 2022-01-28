@@ -35,7 +35,7 @@ resource "databricks_sql_query" "count_customers" {
 resource "databricks_sql_query" "count_items_sold" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
   name           = "Items Sold (Terraform)"
-  query          = "SELECT SUM(order.qty) FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned"
+  query          = "SELECT SUM(order.qty) FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned)"
   run_as_role    = "viewer"
 }
 
