@@ -269,3 +269,79 @@ resource "databricks_sql_visualization" "count_items_sold" {
     }
   )
 }
+
+resource "databricks_sql_dashboard" "dashboard" {
+  name = "Sales Dashboard (Terraform)"
+}
+
+resource "databricks_sql_widget" "revenue_by_state" {
+  dashboard_id = databricks_sql_dashboard.dashboard.id
+  visualization_id = databricks_sql_visualization.revenue_by_state.id
+
+  position {
+    size_x = 3
+    size_y = 9
+    pos_x = 0
+    pos_y = 5
+  }
+}
+
+resource "databricks_sql_widget" "sales_over_time" {
+  dashboard_id = databricks_sql_dashboard.dashboard.id
+  visualization_id = databricks_sql_visualization.sales_over_time.id
+
+  position {
+    size_x = 3
+    size_y = 6
+    pos_x = 3
+    pos_y = 8
+  }
+}
+
+resource "databricks_sql_widget" "top_ten_customers" {
+  dashboard_id = databricks_sql_dashboard.dashboard.id
+  visualization_id = databricks_sql_visualization.top_ten_customers.id
+
+  position {
+    size_x = 3
+    size_y = 8
+    pos_x = 3
+    pos_y = 0
+  }
+}
+
+resource "databricks_sql_widget" "count_customers" {
+  dashboard_id = databricks_sql_dashboard.dashboard.id
+  visualization_id = databricks_sql_visualization.count_customers.id
+
+  position {
+    size_x = 1
+    size_y = 5
+    pos_x = 1
+    pos_y = 0
+  }
+}
+
+resource "databricks_sql_widget" "count_items_sold" {
+  dashboard_id = databricks_sql_dashboard.dashboard.id
+  visualization_id = databricks_sql_visualization.count_items_sold.id
+
+  position {
+    size_x = 1
+    size_y = 5
+    pos_x = 2
+    pos_y = 0
+  }
+}
+
+resource "databricks_sql_widget" "title" {
+  dashboard_id = databricks_sql_dashboard.dashboard.id
+  text = "# Sales Overview"
+
+  position {
+    size_x = 1
+    size_y = 5
+    pos_x = 0
+    pos_y = 0
+  }
+}
