@@ -6,43 +6,63 @@ resource "databricks_sql_endpoint" "endpoint" {
 
 resource "databricks_sql_query" "revenue_by_state" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
-  name           = "Revenue by State (Terraform)"
+  name           = "Revenue by State"
   query          = "SELECT state,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned) GROUP BY state ORDER BY state"
   run_as_role    = "viewer"
+  
+  tags = [
+    "Terraform"
+  ]
 }
 
 resource "databricks_sql_query" "sales_over_time" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
-  name           = "Sales Over Time (Terraform)"
+  name           = "Sales Over Time"
   query          = "SELECT DATE_FORMAT(order_datetime, 'y-MM-dd') AS day, SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned WHERE order_datetime IS NOT NULL) GROUP BY day ORDER BY day"
   run_as_role    = "viewer"
+
+  tags = [
+    "Terraform"
+  ]
 }
 
 resource "databricks_sql_query" "top_ten_customers" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
-  name           = "Customer Leaderboard (Terraform)"
+  name           = "Customer Leaderboard"
   query          = "SELECT customer_name,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned) GROUP BY customer_name ORDER BY revenue DESC LIMIT 10"
   run_as_role    = "viewer"
+
+  tags = [
+    "Terraform"
+  ]
 }
 
 resource "databricks_sql_query" "count_customers" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
-  name           = "Customer Count (Terraform)"
+  name           = "Customer Count"
   query          = "SELECT COUNT(DISTINCT(customer_id)) FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned"
   run_as_role    = "viewer"
+
+  tags = [
+    "Terraform"
+  ]
 }
 
 resource "databricks_sql_query" "count_items_sold" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
-  name           = "Items Sold (Terraform)"
+  name           = "Items Sold"
   query          = "SELECT SUM(order.qty) FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned)"
   run_as_role    = "viewer"
+
+  tags = [
+    "Terraform"
+  ]
 }
 
 resource "databricks_sql_visualization" "revenue_by_state" {
   query_id    = databricks_sql_query.revenue_by_state.id
   type        = "choropleth"
-  name        = "Revenue by State (Terraform)"
+  name        = "Revenue by State"
   options = jsonencode(
     {
       "mapType": "usa",
@@ -88,7 +108,7 @@ resource "databricks_sql_visualization" "revenue_by_state" {
 resource "databricks_sql_visualization" "sales_over_time" {
   query_id    = databricks_sql_query.sales_over_time.id
   type        = "chart"
-  name        = "Sales Over Time (Terraform)"
+  name        = "Sales Over Time"
   options = jsonencode(
     {
       "version": 2,
@@ -166,7 +186,7 @@ resource "databricks_sql_visualization" "sales_over_time" {
 resource "databricks_sql_visualization" "top_ten_customers" {
   query_id    = databricks_sql_query.top_ten_customers.id
   type        = "table"
-  name        = "Customer Leaderboard (Terraform)"
+  name        = "Customer Leaderboard"
   options = jsonencode(
     {
       "itemsPerPage": 10,
@@ -235,7 +255,7 @@ resource "databricks_sql_visualization" "top_ten_customers" {
 resource "databricks_sql_visualization" "count_customers" {
   query_id    = databricks_sql_query.count_customers.id
   type        = "counter"
-  name        = "Customer Count (Terraform)"
+  name        = "Customer Count"
   options = jsonencode(
     {
       "counterLabel": "Customers",
@@ -254,7 +274,7 @@ resource "databricks_sql_visualization" "count_customers" {
 resource "databricks_sql_visualization" "count_items_sold" {
   query_id    = databricks_sql_query.count_items_sold.id
   type        = "counter"
-  name        = "Customer Count (Terraform)"
+  name        = "Customer Count"
   options = jsonencode(
     {
       "counterLabel": "Items Sold",
@@ -271,7 +291,11 @@ resource "databricks_sql_visualization" "count_items_sold" {
 }
 
 resource "databricks_sql_dashboard" "dashboard" {
-  name = "Sales Dashboard (Terraform)"
+  name = "Sales Dashboard"
+
+  tags = [
+    "Terraform"
+  ]
 }
 
 resource "databricks_sql_widget" "revenue_by_state" {
