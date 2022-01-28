@@ -296,6 +296,8 @@ resource "databricks_sql_widget" "sales_over_time" {
     pos_x = 3
     pos_y = 8
   }
+  
+  title = "Daily Sales"
 }
 
 resource "databricks_sql_widget" "top_ten_customers" {
