@@ -284,6 +284,8 @@ resource "databricks_sql_widget" "revenue_by_state" {
     pos_x = 0
     pos_y = 5
   }
+
+  title = "Total Sales by State"
 }
 
 resource "databricks_sql_widget" "sales_over_time" {
@@ -310,6 +312,8 @@ resource "databricks_sql_widget" "top_ten_customers" {
     pos_x = 3
     pos_y = 0
   }
+
+  title = "Top Ten Customers"
 }
 
 resource "databricks_sql_widget" "count_customers" {
@@ -322,6 +326,8 @@ resource "databricks_sql_widget" "count_customers" {
     pos_x = 1
     pos_y = 0
   }
+
+  title = ""
 }
 
 resource "databricks_sql_widget" "count_items_sold" {
@@ -334,6 +340,8 @@ resource "databricks_sql_widget" "count_items_sold" {
     pos_x = 2
     pos_y = 0
   }
+  
+  title = ""
 }
 
 resource "databricks_sql_widget" "title" {
