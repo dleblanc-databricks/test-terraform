@@ -14,14 +14,28 @@ resource "databricks_sql_query" "revenue_by_state" {
 resource "databricks_sql_query" "sales_over_time" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
   name           = "Sales Over Time (Terraform)"
-  query          = "SELECT DATE_FORMAT(order_datetime, 'y-MM-dd') AS day, SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM hive_metastore.dbacademy_david_leblanc_dewd.sales_orders_cleaned WHERE order_datetime IS NOT NULL) GROUP BY day ORDER BY day"
+  query          = "SELECT DATE_FORMAT(order_datetime, 'y-MM-dd') AS day, SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned WHERE order_datetime IS NOT NULL) GROUP BY day ORDER BY day"
   run_as_role    = "viewer"
 }
 
 resource "databricks_sql_query" "top_ten_customers" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
   name           = "Customer Leaderboard (Terraform)"
-  query          = "SELECT customer_name,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM hive_metastore.dbacademy_david_leblanc_dewd.sales_orders_cleaned) GROUP BY customer_name ORDER BY revenue DESC LIMIT 10"
+  query          = "SELECT customer_name,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned) GROUP BY customer_name ORDER BY revenue DESC LIMIT 10"
+  run_as_role    = "viewer"
+}
+
+resource "databricks_sql_query" "count_customers" {
+  data_source_id = databricks_sql_endpoint.endpoint.data_source_id
+  name           = "Customer Count (Terraform)"
+  query          = "SELECT COUNT(DISTINCT(customer_id)) FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned"
+  run_as_role    = "viewer"
+}
+
+resource "databricks_sql_query" "count_items_sold" {
+  data_source_id = databricks_sql_endpoint.endpoint.data_source_id
+  name           = "Items Sold (Terraform)"
+  query          = "SELECT SUM(order.qty) FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned"
   run_as_role    = "viewer"
 }
 
@@ -213,6 +227,44 @@ resource "databricks_sql_visualization" "top_ten_customers" {
           }
       ],
       "version": 2,
+      "showPlotlyControls": true
+    }
+  )
+}
+
+resource "databricks_sql_visualization" "count_customers" {
+  query_id    = databricks_sql_query.count_customers.id
+  type        = "counter"
+  name        = "Customer Count (Terraform)"
+  options = jsonencode(
+    {
+      "counterLabel": "Customers",
+      "counterColName": "count(DISTINCT customer_id)",
+      "rowNumber": 1,
+      "targetRowNumber": 1,
+      "stringDecimal": 0,
+      "stringDecChar": ".",
+      "stringThouSep": ",",
+      "tooltipFormat": "0,0.000",
+      "showPlotlyControls": true
+    }
+  )
+}
+
+resource "databricks_sql_visualization" "count_items_sold" {
+  query_id    = databricks_sql_query.count_items_sold.id
+  type        = "counter"
+  name        = "Customer Count (Terraform)"
+  options = jsonencode(
+    {
+      "counterLabel": "Items Sold",
+      "counterColName": "sum(order.qty)",
+      "rowNumber": 1,
+      "targetRowNumber": 1,
+      "stringDecimal": 0,
+      "stringDecChar": ".",
+      "stringThouSep": ",",
+      "tooltipFormat": "0,0.000",
       "showPlotlyControls": true
     }
   )
