@@ -351,7 +351,7 @@ resource "databricks_sql_widget" "count_customers" {
     pos_y = 0
   }
 
-  title = ""
+  title = " "
 }
 
 resource "databricks_sql_widget" "count_items_sold" {
@@ -365,7 +365,7 @@ resource "databricks_sql_widget" "count_items_sold" {
     pos_y = 0
   }
   
-  title = ""
+  title = " "
 }
 
 resource "databricks_sql_widget" "title" {
