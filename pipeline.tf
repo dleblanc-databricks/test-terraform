@@ -6,7 +6,6 @@ variable "dlt_notebook_path" {
 resource "databricks_pipeline" "pipeline" {
   name    = "${data.databricks_current_user.me.alphanumeric} (Terraform)"
   storage = "${data.databricks_current_user.me.home}/dbacademy/${var.course_name}"
-  target = "dbacademy_${data.databricks_current_user.me.alphanumeric}_${var.course_name}"
 
   library {
     notebook {
