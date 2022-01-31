@@ -1,5 +1,5 @@
 resource "databricks_sql_endpoint" "endpoint" {
-  name             = "Endpoint of ${data.databricks_current_user.me.alphanumeric}"
+  name             = "${data.databricks_current_user.me.alphanumeric} (Terraform)"
   cluster_size     = "Small"
   max_num_clusters = 1
 }
@@ -365,7 +365,7 @@ resource "databricks_sql_widget" "count_items_sold" {
     pos_y = 0
   }
   
-  title = ""
+  title = "no title"
 }
 
 resource "databricks_sql_widget" "title" {
