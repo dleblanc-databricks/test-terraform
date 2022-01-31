@@ -7,7 +7,7 @@ resource "databricks_sql_endpoint" "endpoint" {
 resource "databricks_sql_query" "revenue_by_state" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
   name           = "Revenue by State"
-  query          = "SELECT state,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned) GROUP BY state ORDER BY state"
+  query          = "SELECT state,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM delta.`${databricks_pipeline.pipeline.storage}/tables/sales_orders_cleaned`) GROUP BY state ORDER BY state"
   run_as_role    = "viewer"
   
   tags = [
@@ -29,7 +29,7 @@ resource "databricks_sql_query" "sales_over_time" {
 resource "databricks_sql_query" "top_ten_customers" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
   name           = "Customer Leaderboard"
-  query          = "SELECT customer_name,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned) GROUP BY customer_name ORDER BY revenue DESC LIMIT 10"
+  query          = "SELECT customer_name,SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM delta.`${databricks_pipeline.pipeline.storage}/tables/sales_orders_cleaned`) GROUP BY customer_name ORDER BY revenue DESC LIMIT 10"
   run_as_role    = "viewer"
 
   tags = [
@@ -40,7 +40,7 @@ resource "databricks_sql_query" "top_ten_customers" {
 resource "databricks_sql_query" "count_customers" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
   name           = "Customer Count"
-  query          = "SELECT COUNT(DISTINCT(customer_id)) FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned"
+  query          = "SELECT COUNT(DISTINCT(customer_id)) FROM delta.`${databricks_pipeline.pipeline.storage}/tables/sales_orders_cleaned`"
   run_as_role    = "viewer"
 
   tags = [
@@ -51,7 +51,7 @@ resource "databricks_sql_query" "count_customers" {
 resource "databricks_sql_query" "count_items_sold" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
   name           = "Items Sold"
-  query          = "SELECT SUM(order.qty) FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM ${var.metastore}.${databricks_pipeline.pipeline.target}.sales_orders_cleaned)"
+  query          = "SELECT SUM(order.qty) FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM delta.`${databricks_pipeline.pipeline.storage}/tables/sales_orders_cleaned`)"
   run_as_role    = "viewer"
 
   tags = [
