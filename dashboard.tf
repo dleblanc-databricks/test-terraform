@@ -18,7 +18,7 @@ resource "databricks_sql_query" "revenue_by_state" {
 resource "databricks_sql_query" "sales_over_time" {
   data_source_id = databricks_sql_endpoint.endpoint.data_source_id
   name           = "Sales Over Time"
-  query          = "SELECT DATE_FORMAT(order_datetime, 'y-MM-dd') AS day, SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM delta.`${databricks_pipeline.pipeline.storage}/tables/sales_orders_cleaned WHERE order_datetime IS NOT NULL) GROUP BY day ORDER BY day"
+  query          = "SELECT DATE_FORMAT(order_datetime, 'y-MM-dd') AS day, SUM(order.qty*order.price) AS revenue FROM (SELECT customer_name,order_datetime,EXPLODE(ordered_products) AS order,state FROM delta.`${databricks_pipeline.pipeline.storage}/tables/sales_orders_cleaned` WHERE order_datetime IS NOT NULL) GROUP BY day ORDER BY day"
   run_as_role    = "viewer"
 
   tags = [
