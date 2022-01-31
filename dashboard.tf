@@ -379,3 +379,7 @@ resource "databricks_sql_widget" "title" {
     pos_y = 0
   }
 }
+
+output "dlt_output_dir" {
+  value = databricks_pipeline.pipeline.storage
+}
